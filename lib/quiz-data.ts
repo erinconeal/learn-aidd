@@ -554,6 +554,543 @@ The manifesto embraces the art, craft, and imagination of intelligent machines t
       },
     ],
   },
+  {
+    slug: "js-closures-scope",
+    title: "Closures & scope",
+    description: "Lexical scope, closures, and common pitfalls (great for React hooks)",
+    explainer: `**Lexical scope** means where a variable is visible is determined by where it is written in source code, not where a function runs.
+
+**A closure** is a function that "closes over" variables from an outer scope and keeps access to them after the outer function returns.
+
+**Why it matters in UIs:** effects, callbacks, and timers often capture values from render. If you do not list dependencies correctly (React) or misunderstand stale closures, you see "old" state.
+
+**Classic pitfall:** \`var\` in a loop shares one binding; \`let\` creates a new binding per iteration. Another: assuming an async callback sees the latest variable without reading it from a ref or passing it in.`,
+    questions: [
+      {
+        id: "cls-1",
+        question: "Lexical scope is determined primarily by ___ in the source code.",
+        options: ["Where the function is called", "Where variables and blocks are written", "The call stack at runtime", "The module bundler"],
+        correctIndex: 1,
+      },
+      {
+        id: "cls-2",
+        question: "A closure allows an inner function to ___ variables from an outer scope after the outer function has finished.",
+        options: ["Delete", "Retain access to", "Reassign only in strict mode", "Optimize away"],
+        correctIndex: 1,
+      },
+      {
+        id: "cls-3",
+        question: "In a for-loop, why does `let` often behave more predictably than `var` for callbacks?",
+        options: [
+          "`let` is faster",
+          "`let` creates a new binding per iteration; `var` shares one loop-scoped binding",
+          "`var` is not hoisted",
+          "Browsers ignore `var` in loops",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: "cls-4",
+        question: 'What does this typically log? `for (var i = 0; i < 3; i++) { setTimeout(() => console.log(i), 0); }`',
+        options: ["0, 1, 2", "3, 3, 3", "undefined three times", "It throws"],
+        correctIndex: 1,
+      },
+      {
+        id: "cls-5",
+        question: "A \"stale closure\" in UI code usually means ___",
+        options: [
+          "The network response expired",
+          "A callback captured an old value of state or props",
+          "The CSS class name is wrong",
+          "The bundle hash changed",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: "cls-6",
+        question: "Module scope (ES modules) means top-level `let` at file top is ___",
+        options: ["Global on `window`", "Private to that module, not visible to other files by default", "Shared with all imports", "Only visible in development"],
+        correctIndex: 1,
+      },
+      {
+        id: "cls-7",
+        question: "When a function returns another function, the inner function forms a closure over ___",
+        options: ["Only globals", "The outer function's variables it references", "Only arguments passed to the inner function", "Nothing; closures are a TypeScript feature"],
+        correctIndex: 1,
+      },
+      {
+        id: "cls-8",
+        question: "`function outer() { const x = 1; return () => x; }` — calling the returned function twice reads ___",
+        options: [
+          "A new `x` each time",
+          "The same captured `x` from the `outer` invocation that created it",
+          "Always `undefined`",
+          "An error because `x` was garbage-collected",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: "cls-9",
+        question: "Compared to Vue’s Composition API, React hooks rely heavily on understanding ___",
+        options: ["Only CSS", "Closure and render-cycle semantics", "Only the virtual DOM", "Webpack configuration"],
+        correctIndex: 1,
+      },
+      {
+        id: "cls-10",
+        question: "An IIFE (immediately invoked function expression) was historically used to ___",
+        options: [
+          "Speed up promises",
+          "Create a new scope to avoid polluting the global namespace",
+          "Enable TypeScript",
+          "Replace `async`/`await`",
+        ],
+        correctIndex: 1,
+      },
+    ],
+  },
+  {
+    slug: "async-promises",
+    title: "Async & Promises",
+    description: "Promise chains, async/await, and parallel vs sequential work",
+    explainer: `A **Promise** represents a value that may be available later. **\`.then()\`** returns a new Promise; if you return a non-thenable value, it wraps it. That is why "double \`.then()\`" often means the first step returns something you must unwrap in the second.
+
+**\`async\` functions** always return a Promise. **\`await\`** pauses the async function until the Promise settles.
+
+**\`Promise.all\`** fails fast if any input rejects. **\`Promise.allSettled\`** waits for all. Use parallel fetches when requests are independent; use sequential \`await\` when order matters or the second call depends on the first.
+
+**Race conditions** in UIs often mean overlapping async work: cancel, ignore stale responses, or use an abort controller / latest-request id.`,
+    questions: [
+      {
+        id: "asy-1",
+        question: "Calling `.then(fn)` on a Promise returns ___",
+        options: ["The same Promise unchanged", "A new Promise (chain)", "`undefined`", "A synchronous value only"],
+        correctIndex: 1,
+      },
+      {
+        id: "asy-2",
+        question: "If the first `.then()` returns another Promise, the next `.then()` receives ___",
+        options: [
+          "The Promise object itself",
+          "The settled value of that inner Promise (once it resolves)",
+          "Always `null`",
+          "An error immediately",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: "asy-3",
+        question: "An `async` function always returns ___",
+        options: ["A plain object", "A Promise", "void", "A generator"],
+        correctIndex: 1,
+      },
+      {
+        id: "asy-4",
+        question: "`Promise.all([p1, p2])` resolves when ___",
+        options: [
+          "The first of p1 or p2 settles",
+          "All promises fulfill; if any rejects, the whole thing rejects",
+          "Half of them complete",
+          "Only when called with await",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: "asy-5",
+        question: "`Promise.allSettled` is useful when you need results from ___",
+        options: [
+          "Only the first fulfillment",
+          "Every promise, whether fulfilled or rejected",
+          "Only rejected promises",
+          "Synchronous callbacks",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: "asy-6",
+        question: "To avoid overlapping fetches updating state out of order, a common pattern is ___",
+        options: [
+          "Use `var` for flags",
+          "Track request id / ignore stale responses / AbortController",
+          "Always use `Promise.race` only",
+          "Disable the network tab",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: "asy-7",
+        question: "`await` can only be used inside ___",
+        options: ["Any function", "An async function or at the top level of a module (where supported)", "Only class methods", "Only `.then` callbacks"],
+        correctIndex: 1,
+      },
+      {
+        id: "asy-8",
+        question: "Unhandled Promise rejections in the browser typically ___",
+        options: [
+          "Are silently ignored",
+          "Show as errors / warnings in the console (and may crash Node in strict setups)",
+          "Auto-retry forever",
+          "Convert to sync exceptions in the same tick",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: "asy-9",
+        question: "Sequential `await` in a loop (one after another) is appropriate when ___",
+        options: [
+          "You want maximum parallelism",
+          "Each step depends on the previous result or order must be guaranteed",
+          "You use only `Promise.all`",
+          "You never need error handling",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: "asy-10",
+        question: "`Promise.race` resolves or rejects with ___",
+        options: [
+          "The sum of all durations",
+          "The outcome of whichever promise settles first",
+          "Only if all fulfill",
+          "Always the last promise",
+        ],
+        correctIndex: 1,
+      },
+    ],
+  },
+  {
+    slug: "http-fetch",
+    title: "HTTP & fetch",
+    description: "Status codes, headers, CORS, and the browser security model",
+    explainer: `**REST** over HTTP often uses **GET** (read), **POST** (create / actions), **PUT/PATCH** (update), **DELETE** (remove)—exact semantics depend on the API.
+
+**Status codes:** \`2xx\` success (\`200\` OK, \`201\` created, \`204\` no content). \`3xx\` redirects. \`4xx\` client errors (\`400\` bad request, \`401\` unauthorized, \`403\` forbidden, \`404\` not found). \`5xx\` server errors.
+
+**CORS** is enforced by the browser: cross-origin requests need server cooperation (appropriate \`Access-Control-*\` headers). **Preflight** \`OPTIONS\` requests happen for some "non-simple" cross-origin requests.
+
+**\`fetch\`** returns a Promise resolving to a **Response**; check \`response.ok\` (\`status\` 200–299) before assuming success. Use \`response.json()\` etc. to read the body.`,
+    questions: [
+      {
+        id: "hweb-1",
+        question: "HTTP status codes in the 4xx range generally indicate ___",
+        options: ["Server crashed", "A problem with the client request or authorization", "Success with warnings", "DNS failure only"],
+        correctIndex: 1,
+      },
+      {
+        id: "hweb-2",
+        question: "`404 Not Found` most often means ___",
+        options: ["Server error", "The resource path does not exist (for that method)", "Rate limited", "CORS blocked"],
+        correctIndex: 1,
+      },
+      {
+        id: "hweb-3",
+        question: "`500 Internal Server Error` indicates ___",
+        options: [
+          "The client sent bad JSON",
+          "Something went wrong on the server",
+          "The response was cached",
+          "The request was cancelled",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: "hweb-4",
+        question: "CORS is primarily enforced by ___",
+        options: ["The database", "The browser", "TCP", "Git"],
+        correctIndex: 1,
+      },
+      {
+        id: "hweb-5",
+        question: "A cross-origin request that triggers a CORS preflight typically uses ___ before the real request",
+        options: ["GET", "OPTIONS", "TRACE", "CONNECT"],
+        correctIndex: 1,
+      },
+      {
+        id: "hweb-6",
+        question: "After `const r = await fetch(url)`, you should check success with ___",
+        options: [
+          "Only `r.status === 200` (never use `.ok`)",
+          "`r.ok` or inspect `r.status`, then parse the body",
+          "`r.json()` always throws on error",
+          "`fetch` throws on 404 automatically",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: "hweb-7",
+        question: "`Authorization` headers for bearer tokens are often sent on ___",
+        options: [
+          "Only WebSocket handshakes",
+          "Authenticated API requests (when the app chooses to include them)",
+          "Every favicon request",
+          "DNS lookups",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: "hweb-8",
+        question: "`204 No Content` commonly means ___",
+        options: [
+          "The server is offline",
+          "Success with no response body",
+          "Client must retry forever",
+          "Invalid JSON",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: "hweb-9",
+        question: "Idempotent HTTP methods (safe retries) often include ___",
+        options: ["POST for all APIs", "GET and PUT (among others, depending on API design)", "Only WebSocket", "GraphQL only"],
+        correctIndex: 1,
+      },
+      {
+        id: "hweb-10",
+        question: "Request headers like `Content-Type: application/json` tell the server ___",
+        options: [
+          "Which CSS file to load",
+          "How to interpret the request body",
+          "The user's password in plain text",
+          "Which database row to delete",
+        ],
+        correctIndex: 1,
+      },
+    ],
+  },
+  {
+    slug: "web-performance",
+    title: "Web performance",
+    description: "Metrics, networks, bundles, and when optimization matters",
+    explainer: `**Measure before optimizing.** Use DevTools Network (waterfall), Performance panel, and field data when available.
+
+**Core Web Vitals** include **LCP** (largest contentful paint—loading performance), **INP** (interaction to next paint—responsiveness), **CLS** (cumulative layout shift—visual stability).
+
+**Common wins:** fewer sequential network dependencies, compress images, lazy-load below-the-fold content, avoid huge JS bundles on first paint, use caching headers intentionally.
+
+**Premature optimization** is tuning code before you know the bottleneck; profiling shows whether CPU, network, or layout dominates.`,
+    questions: [
+      {
+        id: "perf-1",
+        question: "LCP (Largest Contentful Paint) primarily measures ___",
+        options: ["Time to first byte only", "When the largest visible content element paints", "JavaScript parse time only", "Server CPU usage"],
+        correctIndex: 1,
+      },
+      {
+        id: "perf-2",
+        question: "CLS (Cumulative Layout Shift) captures ___",
+        options: [
+          "How many API calls failed",
+          "Unexpected layout movement after content loads",
+          "Time spent in React render",
+          "Lighthouse score only",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: "perf-3",
+        question: "A long network waterfall often suggests ___",
+        options: [
+          "Too many sequential requests blocking later work",
+          "That CSS is unnecessary",
+          "That you must delete React",
+          "That HTTP/2 is disabled everywhere",
+        ],
+        correctIndex: 0,
+      },
+      {
+        id: "perf-4",
+        question: "Code-splitting (dynamic `import()`) helps by ___",
+        options: [
+          "Removing TypeScript",
+          "Loading some JS only when a route or feature needs it",
+          "Making images smaller automatically",
+          "Disabling the browser cache",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: "perf-5",
+        question: "`Promise.all` for independent API calls can improve perceived performance by ___",
+        options: [
+          "Running them in parallel instead of awaiting one by one",
+          "Caching responses forever",
+          "Eliminating CORS",
+          "Reducing HTML size",
+        ],
+        correctIndex: 0,
+      },
+      {
+        id: "perf-6",
+        question: "Large images without sizing or responsive variants often hurt ___",
+        options: ["Git history", "LCP and bandwidth", "ESLint", "pnpm lockfile"],
+        correctIndex: 1,
+      },
+      {
+        id: "perf-7",
+        question: "Font loading strategies (e.g. `font-display`, subsetting) mainly target ___",
+        options: [
+          "Database indexes",
+          "Invisible text / layout shifts / late swaps",
+          "GraphQL complexity",
+          "npm peer dependencies",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: "perf-8",
+        question: "Profiling before micro-optimizing loops follows the principle of ___",
+        options: ["YAGNI", "Measuring real bottlenecks vs guessing", "Using only `var`", "Avoiding all frameworks"],
+        correctIndex: 1,
+      },
+      {
+        id: "perf-9",
+        question: "Serving static assets with long cache lifetimes works best when ___",
+        options: [
+          "Filenames never change",
+          "Filenames are content-hashed so updates bust cache safely",
+          "You disable HTTPS",
+          "You use only inline scripts",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: "perf-10",
+        question: "Main-thread long tasks can hurt ___",
+        options: [
+          "Only server-side rendering on Node",
+          "Interactivity and INP (input responsiveness)",
+          "DNS prefetch only",
+          "Git merge speed",
+        ],
+        correctIndex: 1,
+      },
+    ],
+  },
+  {
+    slug: "frontend-architecture",
+    title: "Front-end architecture",
+    description: "Boundaries, data flow, and structuring larger UIs",
+    explainer: `**Separation of concerns:** keep UI rendering, application state, and side effects (I/O) in clear boundaries. Exactly how depends on the framework.
+
+**Data layer:** centralize HTTP clients, error handling, and types instead of scattering raw \`fetch\` in every component.
+
+**State placement:** URL for shareable location, server cache for remote data, local component state for ephemeral UI, global stores only when multiple distant components must stay in sync.
+
+**Vue vs React (mental model):** Vue’s SFCs + Composition API vs React’s components + hooks solve similar problems; both need predictable data flow and testable modules.
+
+**Colocation:** keep feature code together (components, hooks, tests) rather than giant technical folders that obscure features.`,
+    questions: [
+      {
+        id: "arch-1",
+        question: "A dedicated API module (single place for `fetch` + error mapping) primarily improves ___",
+        options: [
+          "CSS specificity",
+          "Consistency, testability, and easier refactors of network code",
+          "npm install speed",
+          "Database migrations",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: "arch-2",
+        question: "Putting shareable navigation state in the URL (pathname, query) helps with ___",
+        options: [
+          "Hiding bugs",
+          "Bookmarking, sharing, and back/forward behavior",
+          "Avoiding TypeScript",
+          "Disabling accessibility",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: "arch-3",
+        question: "Presentation (dumb) components are easiest to test when they ___",
+        options: [
+          "Fetch data internally",
+          "Receive data via props and emit changes via callbacks",
+          "Import the global store directly",
+          "Contain routing logic",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: "arch-4",
+        question: "Global client state stores are most justified when ___",
+        options: [
+          "You have one button",
+          "Many distant parts of the UI must reflect the same data",
+          "You dislike props",
+          "The app has no routes",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: "arch-5",
+        question: "Colocating feature code (UI + hooks + tests nearby) tends to improve ___",
+        options: [
+          "Merge conflicts only in `node_modules`",
+          "Discoverability and feature cohesion vs giant folders by file type",
+          "CORS configuration",
+          "Server CPU",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: "arch-6",
+        question: "Side effects (timers, subscriptions, manual DOM) fit best in ___",
+        options: [
+          "Random utility files with no lifecycle",
+          "Framework-provided effect or lifecycle hooks with clear setup/teardown",
+          "JSX return values",
+          "CSS files",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: "arch-7",
+        question: "Duplicated request logic across many components is often a sign you need ___",
+        options: [
+          "More inline styles",
+          "A shared data layer or composable / hook",
+          "A larger bundle",
+          "Slower laptops",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: "arch-8",
+        question: "In many apps, \"container\" vs \"presentational\" separation aims to ___",
+        options: [
+          "Remove HTML",
+          "Keep wiring and I/O out of purely visual components",
+          "Avoid using functions",
+          "Disable server rendering",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: "arch-9",
+        question: "Moving from Vue to React, concepts like composables map most closely to ___",
+        options: [
+          "Only class components",
+          "Hooks and custom hooks for shared stateful logic",
+          "Redux only",
+          "WebAssembly",
+        ],
+        correctIndex: 1,
+      },
+      {
+        id: "arch-10",
+        question: "Architecture reviews often ask whether a module has ___",
+        options: [
+          "More lines than others",
+          "A clear responsibility and stable boundaries with neighbors",
+          "Zero dependencies",
+          "Only default exports",
+        ],
+        correctIndex: 1,
+      },
+    ],
+  },
 ];
 
 /**
