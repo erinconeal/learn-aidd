@@ -1,8 +1,20 @@
-import { describe, test, expect } from "vitest";
+import { describe, test, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
 import { ModuleQuiz } from "./ModuleQuiz";
 import type { QuizModule, QuizQuestion } from "@/lib/quiz-data";
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    back: vi.fn(),
+    forward: vi.fn(),
+    prefetch: vi.fn(),
+    push: vi.fn(),
+    refresh: vi.fn(),
+    replace: vi.fn(),
+  }),
+  useSearchParams: () => new URLSearchParams(),
+}));
 
 const createQuestion = (
   id: string,
