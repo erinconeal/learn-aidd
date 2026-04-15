@@ -11,6 +11,9 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  // Not used on first paint (body is sans-only); preloading mono triggers a
+  // Chrome warning when the file is unused for a few seconds after load.
+  preload: false,
 });
 
 export const metadata: Metadata = {
