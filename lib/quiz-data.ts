@@ -36,8 +36,38 @@ function shuffle<T>(array: T[], seed?: number): T[] {
   return arr;
 }
 
+function hashString(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) {
+    h = Math.imul(31, h) + s.charCodeAt(i);
+  }
+  return h >>> 0;
+}
+
+/**
+ * Returns a copy of the question with answer options in random order.
+ * `correctIndex` is updated so it still points at the same answer text.
+ * @param optionShuffleSeed - When set, shuffle is reproducible (pair with URL seed).
+ */
+export function shuffleQuestionOptions(
+  question: QuizQuestion,
+  optionShuffleSeed?: number
+): QuizQuestion {
+  const tagged = question.options.map((text, i) => ({
+    text,
+    isCorrect: i === question.correctIndex,
+  }));
+  const shuffled = shuffle(tagged, optionShuffleSeed);
+  return {
+    ...question,
+    options: shuffled.map((t) => t.text),
+    correctIndex: shuffled.findIndex((t) => t.isCorrect),
+  };
+}
+
 /**
  * Returns a random subset of questions from the pool. Uses seed for reproducible selection.
+ * Each question’s options are shuffled so the correct choice is not always the same slot.
  * @param questions - Full question pool
  * @param count - Number of questions to return (default 10)
  * @param seed - Optional seed for deterministic selection
@@ -47,8 +77,18 @@ export function getRandomQuestions(
   count: number = 10,
   seed?: number
 ): QuizQuestion[] {
-  if (questions.length <= count) return questions;
-  return shuffle(questions, seed).slice(0, count);
+  const selected =
+    questions.length <= count
+      ? [...questions]
+      : shuffle(questions, seed).slice(0, count);
+
+  return selected.map((q) => {
+    const optionSeed =
+      seed === undefined || Number.isNaN(seed)
+        ? undefined
+        : (Number(seed) ^ hashString(q.id)) >>> 0;
+    return shuffleQuestionOptions(q, optionSeed);
+  });
 }
 
 export const modules: QuizModule[] = [
