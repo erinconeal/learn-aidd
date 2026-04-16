@@ -29,7 +29,11 @@ export default async function ModulePage({ params, searchParams }: PageProps) {
   return (
     <div className="flex min-h-screen">
       <ModuleNav />
-      <main id="main-content" className="flex-1 overflow-auto" tabIndex={-1}>
+      <main
+        id="main-content"
+        className="flex-1 overflow-auto pt-16 md:pt-0"
+        tabIndex={-1}
+      >
         <ModuleQuiz
           module={moduleData}
           questions={questions}
